@@ -4,7 +4,6 @@ import com.rom4ik.firsttelegrambot.config.BotConfig;
 import com.rom4ik.firsttelegrambot.exception.InvalidVideoUrlException;
 import com.rom4ik.firsttelegrambot.exception.YouTubeMp3ApiResponseFailStatusException;
 import com.rom4ik.firsttelegrambot.model.Audio;
-import com.rom4ik.firsttelegrambot.service.YesNoImageGeneratorService;
 import com.rom4ik.firsttelegrambot.service.YouTubeMP3DownloadService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

@@ -25,11 +25,11 @@ import java.util.regex.Pattern;
 @PropertySource("application.properties")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class YouTubeMP3DownloadService {
-    @Value("${api.youTubeMp3Api.url}")
+    @Value("${api.youTubeMp3.url}")
     String youTubeMp3ApiUrl;
-    @Value("${api.youTubeMp3Api.key}")
+    @Value("${api.youTubeMp3.key}")
     String youTubeMp3ApiKey;
-    @Value("${api.youTubeMp3Api.host}")
+    @Value("${api.youTubeMp3.host}")
     String youTubeMp3ApiHost;
     final RestTemplate restTemplate;
 
@@ -39,11 +39,11 @@ public class YouTubeMP3DownloadService {
     }
 
     public Audio getAudioFromVideoUrl(String youTubeVideoUrl) {
-        YouTubeMp3ApiResponseDTO youTubeMp3ApiResponseDTO = getAudioUrlFromVideoUrl(youTubeVideoUrl);
+        YouTubeMp3ApiResponseDTO youTubeMp3ApiResponseDTO = getAudioDTOFromVideoUrl(youTubeVideoUrl);
         return getAudioFromAudioDTO(youTubeMp3ApiResponseDTO);
     }
 
-    private YouTubeMp3ApiResponseDTO getAudioUrlFromVideoUrl(String youTubeVideoUrl) {
+    private YouTubeMp3ApiResponseDTO getAudioDTOFromVideoUrl(String youTubeVideoUrl) {
         String videoId = getVideoIdFromUrl(youTubeVideoUrl);
 
         log.debug("Provided YouTube video link: {}", youTubeVideoUrl);

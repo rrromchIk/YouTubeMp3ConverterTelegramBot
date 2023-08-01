@@ -1,6 +1,5 @@
 telegram.bot.name=
 telegram.bot.token=
-api.yesNoApi.url=
-api.youTubeMp3Api.url=
-api.youTubeMp3Api.key=
-api.youTubeMp3Api.host=
+api.youTubeMp3.url=
+api.youTubeMp3.key=
+api.youTubeMp3.host=
