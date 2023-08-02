@@ -1,5 +1,16 @@
+server.port=5000
+
 telegram.bot.name=
 telegram.bot.token=
+
 api.youTubeMp3.url=
 api.youTubeMp3.key=
 api.youTubeMp3.host=
+
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost:3306/...
+spring.datasource.username=root
+spring.datasource.password=
+
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.properties.hibernate.show_sql=false

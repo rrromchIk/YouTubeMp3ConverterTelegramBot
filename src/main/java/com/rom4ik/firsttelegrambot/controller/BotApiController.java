@@ -1,12 +1,16 @@
 package com.rom4ik.firsttelegrambot.controller;
 
-import com.rom4ik.firsttelegrambot.service.YesNoImageGeneratorService;
-import com.rom4ik.firsttelegrambot.service.YouTubeMP3DownloadService;
+import com.rom4ik.firsttelegrambot.model.ReceivedUpdate;
+import com.rom4ik.firsttelegrambot.service.ReceivedUpdatesService;
+import com.rom4ik.firsttelegrambot.service.api.YesNoImageGeneratorService;
+import com.rom4ik.firsttelegrambot.service.api.YouTubeMP3DownloadService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author rom4ik
@@ -20,7 +24,7 @@ public class BotApiController {
 
     @Autowired
     public BotApiController(YesNoImageGeneratorService yesNoImageGeneratorService,
-                            YouTubeMP3DownloadService youTubeMP3DownloadService) {
+                            YouTubeMP3DownloadService youTubeMP3DownloadService, ReceivedUpdatesService receivedUpdatesService) {
         this.yesNoImageGeneratorService = yesNoImageGeneratorService;
         this.youTubeMP3DownloadService = youTubeMP3DownloadService;
     }
