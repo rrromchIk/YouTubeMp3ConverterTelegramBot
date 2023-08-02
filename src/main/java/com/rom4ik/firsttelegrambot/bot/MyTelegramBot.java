@@ -4,7 +4,11 @@ import com.rom4ik.firsttelegrambot.config.BotConfig;
 import com.rom4ik.firsttelegrambot.exception.InvalidVideoUrlException;
 import com.rom4ik.firsttelegrambot.exception.YouTubeMp3ApiResponseFailStatusException;
 import com.rom4ik.firsttelegrambot.model.Audio;
-import com.rom4ik.firsttelegrambot.service.YouTubeMP3DownloadService;
+import com.rom4ik.firsttelegrambot.model.BotResponse;
+import com.rom4ik.firsttelegrambot.model.ReceivedUpdate;
+import com.rom4ik.firsttelegrambot.service.BotResponsesService;
+import com.rom4ik.firsttelegrambot.service.ReceivedUpdatesService;
+import com.rom4ik.firsttelegrambot.service.api.YouTubeMP3DownloadService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
@@ -19,6 +23,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.ByteArrayInputStream;
+import java.util.Date;
 
 /**
  * @author rom4ik
@@ -30,13 +35,20 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     BotConfig botConfig;
     YouTubeMP3DownloadService youTubeMP3DownloadService;
     RestTemplate restTemplate;
+    ReceivedUpdatesService receivedUpdatesService;
+    BotResponsesService botResponsesService;
+
 
     @Autowired
-    public MyTelegramBot(BotConfig botConfig, YouTubeMP3DownloadService youTubeMP3DownloadService, RestTemplate restTemplate) {
+    public MyTelegramBot(BotConfig botConfig, YouTubeMP3DownloadService youTubeMP3DownloadService,
+                         ReceivedUpdatesService receivedUpdatesService, BotResponsesService botResponsesService,
+                         RestTemplate restTemplate) {
         super(botConfig.getToken());
         this.botConfig = botConfig;
         this.youTubeMP3DownloadService = youTubeMP3DownloadService;
         this.restTemplate = restTemplate;
+        this.receivedUpdatesService = receivedUpdatesService;
+        this.botResponsesService = botResponsesService;
     }
 
     @Override
@@ -47,21 +59,29 @@ public class MyTelegramBot extends TelegramLongPollingBot {
             String message = update.getMessage().getText();
 
             log.debug("Update received. Chat id: {}, userName: {}, message: {}", chatId, userName, message);
+            receivedUpdatesService.saveUpdate(new ReceivedUpdate(userName, chatId, message, new Date(), new Date()));
 
+            String replyMessage;
             if(message.equals("/start")) {
-                sendMessage(chatId, "Hello, " + userName +", send me link)");
+                replyMessage = "Hello, " + userName +", send me link)";
+                sendMessage(chatId, replyMessage);
             } else {
                 try {
                     Audio audio = youTubeMP3DownloadService.getAudioFromVideoUrl(message);
                     sendAudio(chatId, audio);
+                    replyMessage = "Sending audio: " + audio.getName();
                 } catch (InvalidVideoUrlException e) {
                     log.error(e.getMessage());
-                    sendMessage(chatId, "Invalid video URL. Please provide valid YouTube video URL :)");
+                    replyMessage = "Invalid video URL. Please provide valid YouTube video URL :)";
+                    sendMessage(chatId, replyMessage);
                 } catch (YouTubeMp3ApiResponseFailStatusException e) {
                     log.error(e.getMessage());
-                    sendMessage(chatId, e.getMessage());
+                    replyMessage = e.getMessage();
+                    sendMessage(chatId, replyMessage);
                 }
             }
+
+            botResponsesService.saveBotResponse(new BotResponse(userName, chatId, replyMessage, new Date(), new Date()));
         }
     }
 

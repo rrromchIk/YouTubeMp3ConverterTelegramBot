@@ -1,4 +1,4 @@
-package com.rom4ik.firsttelegrambot.service;
+package com.rom4ik.firsttelegrambot.service.api;
 
 import com.rom4ik.firsttelegrambot.dto.YouTubeMp3ApiResponseDTO;
 import com.rom4ik.firsttelegrambot.exception.InvalidVideoUrlException;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  */
 @Service
 @Log4j2
-@PropertySource("application.properties")
+@PropertySource("classpath:application.properties")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class YouTubeMP3DownloadService {
     @Value("${api.youTubeMp3.url}")
@@ -89,7 +89,7 @@ public class YouTubeMP3DownloadService {
     }
 
     private String getVideoIdFromUrl(String videoUrl) {
-        String videoId = null;
+        String videoId;
 
         // The pattern to match YouTube video IDs in different URL formats
         Pattern pattern = Pattern.compile(
