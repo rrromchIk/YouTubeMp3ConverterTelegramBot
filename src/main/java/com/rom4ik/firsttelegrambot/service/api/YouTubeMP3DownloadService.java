@@ -39,33 +39,25 @@ public class YouTubeMP3DownloadService {
     }
 
     public Audio getAudioFromVideoUrl(String youTubeVideoUrl) {
-        YouTubeMp3ApiResponseDTO youTubeMp3ApiResponseDTO = getAudioDTOFromVideoUrl(youTubeVideoUrl);
+        log.debug("Provided YouTube video link: {}", youTubeVideoUrl);
+
+        String videoId = getVideoIdFromUrl(youTubeVideoUrl);
+        log.debug("Video id: {}", videoId);
+
+        YouTubeMp3ApiResponseDTO youTubeMp3ApiResponseDTO = getAudioDTOFromVideoId(videoId);
         return getAudioFromAudioDTO(youTubeMp3ApiResponseDTO);
     }
 
-    private YouTubeMp3ApiResponseDTO getAudioDTOFromVideoUrl(String youTubeVideoUrl) {
-        String videoId = getVideoIdFromUrl(youTubeVideoUrl);
-
-        log.debug("Provided YouTube video link: {}", youTubeVideoUrl);
-        log.debug("Video id: {}", videoId);
-
+    private YouTubeMp3ApiResponseDTO getAudioDTOFromVideoId(String videoId) {
         ResponseEntity<YouTubeMp3ApiResponseDTO> responseEntity = sendRequestToYouTubeMp3Api(videoId);
         YouTubeMp3ApiResponseDTO youTubeMp3ApiResponseDTO = responseEntity.getBody();
-        checkResponse(youTubeMp3ApiResponseDTO);
+
+        switch (youTubeMp3ApiResponseDTO.getStatus()) {
+            case "fail" -> throw new YouTubeMp3ApiResponseFailStatusException(youTubeMp3ApiResponseDTO.getMsg());
+            case "processing" -> youTubeMp3ApiResponseDTO = getAudioDTOFromVideoId(videoId);
+        }
 
         return youTubeMp3ApiResponseDTO;
-    }
-
-    private Audio getAudioFromAudioDTO(YouTubeMp3ApiResponseDTO youTubeMp3ApiResponseDTO) {
-        log.debug("GET request to download audio: {}", youTubeMp3ApiResponseDTO.getLink());
-
-        ResponseEntity<byte[]> respEnt = restTemplate.getForEntity(youTubeMp3ApiResponseDTO.getLink(), byte[].class);
-        MediaType mediaType = respEnt.getHeaders().getContentType();
-
-        log.debug("Response -> {}", respEnt);
-        log.debug("Audio type in the response: {}", mediaType.toString());
-
-        return new Audio(youTubeMp3ApiResponseDTO.getTitle(), respEnt.getBody());
     }
 
     private ResponseEntity<YouTubeMp3ApiResponseDTO> sendRequestToYouTubeMp3Api(String videoId) {
@@ -84,9 +76,23 @@ public class YouTubeMP3DownloadService {
                 requestEntity,
                 YouTubeMp3ApiResponseDTO.class);
 
-        log.debug("Response from YouTubeMp3API: {}", response);
+        log.debug("Response from YouTubeMp3API: {}", response.getBody());
         return response;
     }
+
+    private Audio getAudioFromAudioDTO(YouTubeMp3ApiResponseDTO youTubeMp3ApiResponseDTO) {
+        log.debug("GET request to download audio: {}", youTubeMp3ApiResponseDTO.getLink());
+
+        ResponseEntity<byte[]> respEnt = restTemplate.getForEntity(youTubeMp3ApiResponseDTO.getLink(), byte[].class);
+        MediaType mediaType = respEnt.getHeaders().getContentType();
+
+        log.debug("Response status -> {}", respEnt.getStatusCode().toString());
+        log.debug("Audio type in the response: {}", mediaType.toString());
+
+        return new Audio(youTubeMp3ApiResponseDTO.getTitle(), respEnt.getBody());
+    }
+
+
 
     private String getVideoIdFromUrl(String videoUrl) {
         String videoId;
@@ -105,11 +111,5 @@ public class YouTubeMP3DownloadService {
         }
 
         return videoId;
-    }
-
-    private void checkResponse(YouTubeMp3ApiResponseDTO youTubeMp3ApiResponseDTO) {
-        if(youTubeMp3ApiResponseDTO.getStatus().equals("fail")) {
-            throw new YouTubeMp3ApiResponseFailStatusException(youTubeMp3ApiResponseDTO.getMsg());
-        }
     }
 }

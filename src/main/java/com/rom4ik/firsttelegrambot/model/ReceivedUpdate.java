@@ -38,11 +38,11 @@ public class ReceivedUpdate {
     @Temporal(TemporalType.TIME)
     Date receivingTime;
 
-    public ReceivedUpdate(String from, Long chatId, String message, Date receivingDate, Date receivingTime) {
+    public ReceivedUpdate(String from, Long chatId, String message, Date receivingDate) {
         this.from = from;
         this.chatId = chatId;
         this.message = message;
         this.receivingDate = receivingDate;
-        this.receivingTime = receivingTime;
+        this.receivingTime = receivingDate;
     }
 }

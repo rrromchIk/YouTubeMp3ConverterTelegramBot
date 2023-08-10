@@ -38,11 +38,11 @@ public class BotResponse {
     @Temporal(TemporalType.TIME)
     Date responseTime;
 
-    public BotResponse(String toUser, Long toChatId, String message, Date responseDate, Date responseTime) {
+    public BotResponse(String toUser, Long toChatId, String message) {
         this.toUser = toUser;
         this.toChatId = toChatId;
         this.message = message;
-        this.responseDate = responseDate;
-        this.responseTime = responseTime;
+        this.responseDate = new Date();
+        this.responseTime = new Date();
     }
 }
